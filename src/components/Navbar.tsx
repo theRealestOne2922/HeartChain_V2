@@ -11,8 +11,8 @@ const Navbar = () => {
   const navLinks = [
     { href: "/", label: "Explore" },
     { href: "/saved-lives", label: "Saved Lives" },
-    { href: "#leaderboard", label: "Leaderboard" },
-    { href: "#about", label: "About" },
+    { href: "/leaderboard", label: "Leaderboard" },
+    { href: "/about", label: "About" },
   ];
 
   return (
@@ -33,49 +33,42 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              link.href.startsWith('#') ? (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="text-muted-foreground hover:text-foreground font-medium transition-colors relative group"
-                >
-                  {link.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
-                </a>
-              ) : (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className={cn(
-                    "text-muted-foreground hover:text-foreground font-medium transition-colors relative group flex items-center gap-1",
-                    location.pathname === link.href && "text-foreground"
-                  )}
-                >
-                  {link.label === "Saved Lives" && <Sparkles className="w-4 h-4 text-success" />}
-                  {link.label}
-                  <span className={cn(
-                    "absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300",
-                    location.pathname === link.href ? "w-full" : "w-0 group-hover:w-full"
-                  )} />
-                </Link>
-              )
+              <Link
+                key={link.href}
+                to={link.href}
+                className={cn(
+                  "text-muted-foreground hover:text-foreground font-medium transition-colors relative group flex items-center gap-1",
+                  location.pathname === link.href && "text-foreground"
+                )}
+              >
+                {link.label === "Saved Lives" && <Sparkles className="w-4 h-4 text-success" />}
+                {link.label}
+                <span className={cn(
+                  "absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300",
+                  location.pathname === link.href ? "w-full" : "w-0 group-hover:w-full"
+                )} />
+              </Link>
             ))}
           </div>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" size="sm" className="gap-2">
-              <Trophy className="w-4 h-4" />
-              <span className="font-semibold">Rank #127</span>
-            </Button>
+            <Link to="/leaderboard">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <Trophy className="w-4 h-4" />
+                <span className="font-semibold">Rank #127</span>
+              </Button>
+            </Link>
             <Button variant="outline" size="sm" className="gap-2">
               <Wallet className="w-4 h-4" />
               Connect Wallet
             </Button>
-            <Button size="sm" className="gradient-heart text-primary-foreground gap-2">
-              <User className="w-4 h-4" />
-              Sign In
-            </Button>
+            <Link to="/profile">
+              <Button size="sm" className="gradient-heart text-primary-foreground gap-2">
+                <User className="w-4 h-4" />
+                Profile
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -100,29 +93,18 @@ const Navbar = () => {
         >
           <div className="flex flex-col gap-4 pt-4">
             {navLinks.map((link) => (
-              link.href.startsWith('#') ? (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="text-muted-foreground hover:text-foreground font-medium py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.label}
-                </a>
-              ) : (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className={cn(
-                    "text-muted-foreground hover:text-foreground font-medium py-2 flex items-center gap-2",
-                    location.pathname === link.href && "text-foreground"
-                  )}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.label === "Saved Lives" && <Sparkles className="w-4 h-4 text-success" />}
-                  {link.label}
-                </Link>
-              )
+              <Link
+                key={link.href}
+                to={link.href}
+                className={cn(
+                  "text-muted-foreground hover:text-foreground font-medium py-2 flex items-center gap-2",
+                  location.pathname === link.href && "text-foreground"
+                )}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {link.label === "Saved Lives" && <Sparkles className="w-4 h-4 text-success" />}
+                {link.label}
+              </Link>
             ))}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
               <Button variant="outline" className="w-full gap-2">
