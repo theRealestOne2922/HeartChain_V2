@@ -155,7 +155,9 @@
   }
   
   .text-gradient {
-    @apply bg-clip-text text-transparent;
-    background: var(--gradient-hero);
+    @apply bg-clip-text text-transparent inline-block;
+    background: linear-gradient(135deg, hsl(270, 60%, 50%), hsl(350, 85%, 60%));
+    -webkit-background-clip: text;
+    background-clip: text;
   }
 }
