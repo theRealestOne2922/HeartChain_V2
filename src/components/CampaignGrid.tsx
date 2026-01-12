@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Campaign, CampaignCategory, Subcategory } from "@/types/campaign";
 import CampaignCard from "./CampaignCard";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ const urgencyFilters = [
 ];
 
 const CampaignGrid = ({ campaigns, title, showFilters = true }: CampaignGridProps) => {
+  const navigate = useNavigate();
   const [categoryFilter, setCategoryFilter] = useState<CampaignCategory | "all">("all");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("all");
 
@@ -98,7 +100,10 @@ const CampaignGrid = ({ campaigns, title, showFilters = true }: CampaignGridProp
               className="animate-slide-up"
               style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <CampaignCard campaign={campaign} />
+              <CampaignCard 
+                campaign={campaign} 
+                onClick={() => navigate(`/campaign/${campaign.id}`)}
+              />
             </div>
           ))}
         </div>

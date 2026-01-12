@@ -145,6 +145,42 @@ export const mockCampaigns: Campaign[] = [
     createdAt: new Date("2024-01-03"),
     updatedAt: new Date("2024-01-18"),
   },
+  {
+    id: "9",
+    title: "Life-Saving Surgery for Grandma Rosa",
+    story: "After years of caring for her grandchildren, Grandma Rosa was diagnosed with a heart condition requiring immediate surgery. The community came together and fully funded her treatment!",
+    imageUrl: "https://images.unsplash.com/photo-1581579438747-104c53c2e4e6?w=800",
+    category: "people",
+    subcategory: "surgery",
+    goalAmount: 50000,
+    raisedAmount: 50000,
+    donorCount: 1247,
+    daysLeft: 0,
+    urgencyLevel: "critical",
+    isVerified: true,
+    beneficiaryName: "Rosa Martinez",
+    location: "Miami, FL",
+    createdAt: new Date("2023-12-01"),
+    updatedAt: new Date("2024-01-10"),
+  },
+  {
+    id: "10",
+    title: "Young Athlete's Recovery Journey",
+    story: "17-year-old Marcus suffered a devastating spinal injury during a football game. Thanks to thousands of generous hearts, he received the surgery he needed and is now in recovery!",
+    imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800",
+    category: "people",
+    subcategory: "accident",
+    goalAmount: 85000,
+    raisedAmount: 85000,
+    donorCount: 2156,
+    daysLeft: 0,
+    urgencyLevel: "high",
+    isVerified: true,
+    beneficiaryName: "Marcus Thompson",
+    location: "Atlanta, GA",
+    createdAt: new Date("2023-11-15"),
+    updatedAt: new Date("2024-01-05"),
+  },
 ];
 
 export const getFeaturedCampaigns = () => {
@@ -157,4 +193,12 @@ export const getUrgentCampaigns = () => {
 
 export const getCampaignsByCategory = (category: 'people' | 'causes') => {
   return mockCampaigns.filter(c => c.category === category);
+};
+
+export const getCompletedCampaigns = () => {
+  return mockCampaigns.filter(c => c.raisedAmount >= c.goalAmount);
+};
+
+export const getActiveCampaigns = () => {
+  return mockCampaigns.filter(c => c.raisedAmount < c.goalAmount);
 };

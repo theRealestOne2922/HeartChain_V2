@@ -121,6 +121,18 @@ export default {
           "0%": { opacity: "0", transform: "translateY(20px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        "heartbeat": {
+          "0%, 100%": { transform: "scale(1)" },
+          "10%": { transform: "scale(1.08)" },
+          "20%": { transform: "scale(1)" },
+          "30%": { transform: "scale(1.08)" },
+          "40%": { transform: "scale(1)" },
+        },
+        "celebration": {
+          "0%": { transform: "translateY(0) scale(1)", opacity: "1" },
+          "50%": { opacity: "1" },
+          "100%": { transform: "translateY(-150px) scale(0)", opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -134,6 +146,8 @@ export default {
         "fade-in": "fade-in 0.5s ease-out",
         "scale-in": "scale-in 0.3s ease-out",
         "slide-up": "slide-up 0.6s ease-out",
+        "heartbeat": "heartbeat 1.5s ease-in-out infinite",
+        "celebration": "celebration 2s ease-out forwards",
       },
     },
   },
