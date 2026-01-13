@@ -4,7 +4,7 @@
 
 ---
 
-## 🚀 Deployed Smart Contracts (Shardeum EVM Testnet)
+##  Deployed Smart Contracts (Shardeum EVM Testnet)
 
 The core logic of HeartChain is immutable and deployed on the **Shardeum Sphinx/Liberty Testnet**.
 
@@ -22,7 +22,7 @@ The core logic of HeartChain is immutable and deployed on the **Shardeum Sphinx/
 
 We have structured the project into three distinct layers. Here is exactly what we use and how to run it.
 
-### 1. 🌐 Frontend (User Interface)
+### 1. Frontend (User Interface)
 The frontend is the window to our application, designed for ease of use and visual appeal.
 
 *   **Next.js 14 (React Framework)**: Used for server-side rendering and static site generation, ensuring fast load times and SEO optimization.
@@ -53,7 +53,7 @@ The frontend is the window to our application, designed for ease of use and visu
 
 ---
 
-### 2. ⚙️ Backend (API & Logic)
+### 2.  Backend (API & Logic)
 The backend manages off-chain data (images, descriptions), authenticates hospital admins, and serves as a bridge for complex queries.
 
 *   **FastAPI (Python)**: A high-performance web framework for building APIs. We use it for its speed and automatic documentation features.
@@ -99,7 +99,7 @@ The backend manages off-chain data (images, descriptions), authenticates hospita
 
 ---
 
-### 3. ⛓️ Blockchain (Smart Contracts)
+### 3.  Blockchain (Smart Contracts)
 The trust layer. This code runs on the Shardeum global computer, not our servers.
 
 *   **Solidity (v0.8.x)**: The programming language for writing the smart contracts (Campaign, Vault, Badges).
@@ -113,7 +113,7 @@ The trust layer. This code runs on the Shardeum global computer, not our servers
 
 ---
 
-## 🌟 Key Features Logic (Detailed)
+##  Key Features Logic (Detailed)
 
 ### 1. **Trustless Funds Management (Escrow)**
 *   **Problem**: In traditional platforms, funds are held by the platform or sent directly to users before treatment.
@@ -135,7 +135,7 @@ The trust layer. This code runs on the Shardeum global computer, not our servers
 
 ---
 
-## 🧪 Smart Contract Architecture (Deep Dive)
+##  Smart Contract Architecture (Deep Dive)
 
 The security model relies on the **Separation of Concerns** principle:
 
@@ -156,7 +156,7 @@ The security model relies on the **Separation of Concerns** principle:
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 Key files and directories you should know about:
 
@@ -186,7 +186,7 @@ HeartChain/
 
 ---
 
-## 📊 System Workflow
+##  System Workflow
 
 The following flow illustrates how money moves through HeartChain:
 
@@ -214,7 +214,7 @@ sequenceDiagram
 
 ---
 
-## 🔌 API Reference (Backend)
+##  API Reference (Backend)
 
 The backend provides REST endpoints for off-chain data management.
 
@@ -227,7 +227,7 @@ The backend provides REST endpoints for off-chain data management.
 
 ---
 
-## ❓ Troubleshooting
+##  Troubleshooting
 
 **1. MetaMask not popping up?**
 *   Ensure you have the browser extension installed.
