@@ -164,22 +164,23 @@ const CampaignDetail = () => {
               />
 
               {/* Stats under heart */}
-              <div className="grid grid-cols-3 gap-6 w-full max-w-md text-center">
+              {/* Stats under heart */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full text-center">
                 <div className="bg-card rounded-xl p-4 shadow-card">
-                  <p className="font-display text-2xl font-bold text-primary">
+                  <p className="font-display text-xl md:text-2xl font-bold text-primary truncate" title={`₹${campaign.raisedAmount.toLocaleString('en-IN')}`}>
                     ₹{campaign.raisedAmount.toLocaleString('en-IN')}
                   </p>
                   <p className="text-sm text-muted-foreground">Raised</p>
                 </div>
                 <div className="bg-card rounded-xl p-4 shadow-card">
-                  <p className="font-display text-2xl font-bold text-foreground flex items-center justify-center gap-1">
+                  <p className="font-display text-xl md:text-2xl font-bold text-foreground flex items-center justify-center gap-1">
                     <Users className="w-5 h-5" />
                     {campaign.donorCount.toLocaleString('en-IN')}
                   </p>
                   <p className="text-sm text-muted-foreground">Donors</p>
                 </div>
                 <div className="bg-card rounded-xl p-4 shadow-card">
-                  <p className="font-display text-2xl font-bold text-foreground flex items-center justify-center gap-1">
+                  <p className="font-display text-xl md:text-2xl font-bold text-foreground flex items-center justify-center gap-1">
                     <Clock className="w-5 h-5" />
                     {campaign.daysLeft}
                   </p>
@@ -314,7 +315,7 @@ const CampaignDetail = () => {
               {/* Blockchain verification */}
               <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                 <ExternalLink className="w-4 h-4" />
-                <span>All donations verified on Polygon blockchain</span>
+                <span>All donations verified on Shardeum blockchain</span>
               </div>
             </div>
           </div>

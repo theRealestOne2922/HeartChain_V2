@@ -24,8 +24,25 @@ const initialUser: LeaderboardUser = {
     joinedAt: new Date(),
 };
 
+// Load user from localStorage
+const loadUserFromStorage = (): LeaderboardUser => {
+    try {
+        const saved = localStorage.getItem("heartchain_user_v3");
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            return {
+                ...parsed,
+                joinedAt: new Date(parsed.joinedAt),
+            };
+        }
+    } catch (e) {
+        console.error("Failed to load user from storage:", e);
+    }
+    return initialUser;
+};
+
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-    const [currentUser, setCurrentUser] = useState<LeaderboardUser>(initialUser);
+    const [currentUser, setCurrentUser] = useState<LeaderboardUser>(() => loadUserFromStorage());
     const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([]);
 
     // Initialize leaderboard directly using mockUsers
@@ -37,6 +54,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         setCurrentUser((prev) => ({ ...prev, rank: myRank }));
         setLeaderboard(allUsers);
     }, []); // Run only on mount initially
+
+    // Save user to localStorage whenever they change
+    useEffect(() => {
+        localStorage.setItem("heartchain_user_v3", JSON.stringify(currentUser));
+    }, [currentUser]);
 
     // Recalculate leaderboard whenever currentUser changes
     useEffect(() => {

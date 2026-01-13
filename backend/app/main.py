@@ -19,6 +19,7 @@ from .routes import (
     donations_router,
     payments_router,
     health_router,
+    blockchain_router,
 )
 
 # Configure logging
@@ -104,6 +105,7 @@ app.include_router(health_router)
 app.include_router(campaigns_router, prefix="/api")
 app.include_router(donations_router, prefix="/api")
 app.include_router(payments_router, prefix="/api")
+app.include_router(blockchain_router, prefix="/api")
 
 
 @app.get("/")

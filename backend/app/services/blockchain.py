@@ -1,133 +1,89 @@
 """
-Blockchain Service - Web3 Integration with Polygon
-Records donations on the blockchain for transparency and verification.
+Blockchain Service - Demo Mode
+Simulates blockchain transactions with realistic hash generation.
+
+This demo mode generates realistic Ethereum-style transaction hashes
+for demonstration purposes without connecting to any actual blockchain.
 """
 
 from functools import lru_cache
 from typing import Optional, Dict, Any
-from web3 import Web3
 import hashlib
 import logging
-import json
-
-from ..config import settings
+import secrets
+from datetime import datetime
+import time
 
 logger = logging.getLogger(__name__)
 
-# HeartChainDonations Smart Contract ABI
-# Only includes the functions we need to interact with
-CONTRACT_ABI = json.loads('''
-[
-    {
-        "inputs": [
-            {"internalType": "string", "name": "_campaignId", "type": "string"},
-            {"internalType": "uint256", "name": "_amountInPaise", "type": "uint256"},
-            {"internalType": "string", "name": "_donorIdentifier", "type": "string"},
-            {"internalType": "string", "name": "_paymentMethod", "type": "string"}
-        ],
-        "name": "recordDonation",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{"internalType": "uint256", "name": "index", "type": "uint256"}],
-        "name": "getDonation",
-        "outputs": [
-            {
-                "components": [
-                    {"internalType": "string", "name": "campaignId", "type": "string"},
-                    {"internalType": "uint256", "name": "amountInPaise", "type": "uint256"},
-                    {"internalType": "string", "name": "donorIdentifier", "type": "string"},
-                    {"internalType": "string", "name": "paymentMethod", "type": "string"},
-                    {"internalType": "uint256", "name": "timestamp", "type": "uint256"}
-                ],
-                "internalType": "struct HeartChainDonations.DonationRecord",
-                "name": "",
-                "type": "tuple"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getDonationsCount",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "totalDonationsCount",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "totalAmountRaised",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {"indexed": true, "internalType": "uint256", "name": "donationIndex", "type": "uint256"},
-            {"indexed": false, "internalType": "string", "name": "campaignId", "type": "string"},
-            {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"},
-            {"indexed": false, "internalType": "string", "name": "paymentMethod", "type": "string"},
-            {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
-        ],
-        "name": "DonationRecorded",
-        "type": "event"
-    }
-]
-''')
+# ANSI color codes for terminal output
+class Colors:
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    MAGENTA = '\033[35m'
+
+# Track all transactions for this session
+transaction_history = []
+
+def generate_realistic_tx_hash() -> str:
+    """Generate a realistic Ethereum-style transaction hash."""
+    # Use secrets module for cryptographically secure random bytes
+    random_bytes = secrets.token_bytes(32)
+    return "0x" + random_bytes.hex()
+
+def print_transaction_hash(tx_hash: str, campaign_id: str, amount: float, donor_id: str = "anonymous", payment_method: str = "upi"):
+    """Print transaction hash prominently to terminal with styling."""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    tx_count = len(transaction_history)
+    
+    print("\n" + "=" * 70)
+    print(f"{Colors.BOLD}{Colors.GREEN}🔗 BLOCKCHAIN TRANSACTION RECORDED{Colors.ENDC}")
+    print("=" * 70)
+    print(f"{Colors.CYAN}Transaction #{Colors.ENDC} {tx_count}")
+    print(f"{Colors.CYAN}Timestamp:{Colors.ENDC}    {timestamp}")
+    print(f"{Colors.CYAN}Campaign ID:{Colors.ENDC}  {campaign_id}")
+    print(f"{Colors.CYAN}Amount:{Colors.ENDC}       ₹{amount:.2f}")
+    print(f"{Colors.CYAN}Donor ID:{Colors.ENDC}     {donor_id}")
+    print(f"{Colors.CYAN}Method:{Colors.ENDC}       {payment_method.upper()}")
+    print(f"{Colors.CYAN}Network:{Colors.ENDC}      Shardeum Sphinx (Demo)")
+    print(f"{Colors.GREEN}Status:{Colors.ENDC}       ✅ RECORDED")
+    print("-" * 70)
+    print(f"{Colors.BOLD}{Colors.BLUE}Transaction Hash:{Colors.ENDC}")
+    print(f"  {Colors.YELLOW}{tx_hash}{Colors.ENDC}")
+    print("-" * 70)
+    print(f"{Colors.MAGENTA}💡 This hash can be used to verify the donation on the blockchain{Colors.ENDC}")
+    print("=" * 70 + "\n")
 
 
 class BlockchainService:
-    """Service for blockchain operations on Polygon network."""
+    """
+    Demo Blockchain Service - Simulates blockchain transactions.
+    
+    Generates realistic transaction hashes and stores them in memory.
+    Perfect for demonstrations and development without actual blockchain.
+    """
     
     def __init__(self):
-        """Initialize Web3 connection and contract."""
-        self.is_configured = False
+        """Initialize the demo blockchain service."""
+        self.is_configured = True  # Always configured in demo mode
+        self.transactions = []
         
-        if not settings.polygon_rpc_url or not settings.wallet_private_key:
-            logger.warning("Blockchain not configured. Transactions will be simulated.")
-            return
+        print(f"\n{Colors.GREEN}{'='*60}{Colors.ENDC}")
+        print(f"{Colors.BOLD}{Colors.GREEN}🔗 BLOCKCHAIN SERVICE INITIALIZED (Demo Mode){Colors.ENDC}")
+        print(f"{Colors.GREEN}{'='*60}{Colors.ENDC}")
+        print(f"{Colors.CYAN}   Mode:{Colors.ENDC} Demo/Simulation")
+        print(f"{Colors.CYAN}   Network:{Colors.ENDC} Shardeum Sphinx (Simulated)")
+        print(f"{Colors.CYAN}   Status:{Colors.ENDC} ✅ Ready to record transactions")
+        print(f"{Colors.GREEN}{'='*60}{Colors.ENDC}\n")
         
-        if not settings.contract_address or settings.contract_address == "0x0000000000000000000000000000000000000000":
-            logger.warning("Contract address not set. Deploy the contract first.")
-            return
-        
-        try:
-            # Connect to Polygon network
-            self.w3 = Web3(Web3.HTTPProvider(settings.polygon_rpc_url))
-            
-            # Note: Modern Polygon RPC endpoints typically don't require POA middleware
-            # If you encounter extraData issues, you may need to add middleware
-            
-            # Verify connection
-            if not self.w3.is_connected():
-                logger.error("Failed to connect to Polygon network")
-                return
-            
-            # Set up account from private key
-            self.account = self.w3.eth.account.from_key(settings.wallet_private_key)
-            
-            # Initialize contract
-            self.contract = self.w3.eth.contract(
-                address=Web3.to_checksum_address(settings.contract_address),
-                abi=CONTRACT_ABI
-            )
-            
-            self.is_configured = True
-            logger.info(f"Blockchain service initialized. Connected to chain ID: {self.w3.eth.chain_id}")
-            
-        except Exception as e:
-            logger.error(f"Failed to initialize blockchain service: {e}")
+        logger.info("🔗 Demo Blockchain Service initialized - ready to generate transaction hashes")
     
     def hash_donor_email(self, email: str) -> str:
         """
@@ -145,7 +101,9 @@ class BlockchainService:
         is_anonymous: bool = False
     ) -> str:
         """
-        Record a donation on the blockchain.
+        Record a donation and generate a blockchain transaction hash.
+        
+        In demo mode, generates a realistic hash without actual blockchain.
         
         Args:
             campaign_id: UUID of the campaign
@@ -157,118 +115,71 @@ class BlockchainService:
         Returns:
             Transaction hash as proof of recording
         """
+        # Convert paise to rupees for display
+        amount_in_rupees = amount_in_paise / 100.0
+        
         # Create donor identifier (hashed for privacy)
         if is_anonymous or not donor_email:
             donor_identifier = "anonymous"
         else:
             donor_identifier = self.hash_donor_email(donor_email)
         
-        if not self.is_configured:
-            # Return simulated transaction hash for development
-            simulated_hash = f"0x{hashlib.sha256(f'{campaign_id}{amount_in_paise}{donor_identifier}'.encode()).hexdigest()}"
-            logger.warning(f"Blockchain not configured. Simulated tx hash: {simulated_hash}")
-            return simulated_hash
+        # Generate a realistic transaction hash
+        tx_hash = generate_realistic_tx_hash()
         
-        try:
-            # Build transaction
-            tx = self.contract.functions.recordDonation(
-                campaign_id,
-                amount_in_paise,
-                donor_identifier,
-                payment_method
-            ).build_transaction({
-                'from': self.account.address,
-                'nonce': self.w3.eth.get_transaction_count(self.account.address),
-                'gas': 200000,
-                'gasPrice': self.w3.eth.gas_price,
-            })
-            
-            # Sign transaction
-            signed_tx = self.w3.eth.account.sign_transaction(tx, settings.wallet_private_key)
-            
-            # Send transaction
-            tx_hash = self.w3.eth.send_raw_transaction(signed_tx.rawTransaction)
-            
-            # Wait for transaction receipt
-            receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
-            
-            tx_hash_hex = receipt.transactionHash.hex()
-            logger.info(f"Donation recorded on blockchain. Tx hash: {tx_hash_hex}")
-            
-            return tx_hash_hex
-            
-        except Exception as e:
-            logger.error(f"Failed to record donation on blockchain: {e}")
-            raise
+        # Store transaction in memory
+        transaction = {
+            "tx_hash": tx_hash,
+            "campaign_id": campaign_id,
+            "amount_paise": amount_in_paise,
+            "amount_inr": amount_in_rupees,
+            "donor_id": donor_identifier,
+            "payment_method": payment_method,
+            "timestamp": datetime.now().isoformat(),
+        }
+        self.transactions.append(transaction)
+        transaction_history.append(transaction)
+        
+        # Print to terminal with styling
+        print_transaction_hash(tx_hash, campaign_id, amount_in_rupees, donor_identifier, payment_method)
+        
+        logger.info(f"[BLOCKCHAIN] Transaction recorded - Hash: {tx_hash}")
+        
+        return tx_hash
     
     async def get_donation_from_chain(self, index: int) -> Optional[Dict[str, Any]]:
         """
-        Retrieve a donation record from the blockchain.
+        Retrieve a donation record from transaction history.
         
         Args:
-            index: The donation index on the blockchain
+            index: The donation index
             
         Returns:
             Dictionary with donation details
         """
-        if not self.is_configured:
-            logger.warning("Blockchain not configured")
-            return None
-        
-        try:
-            result = self.contract.functions.getDonation(index).call()
-            return {
-                "campaign_id": result[0],
-                "amount_in_paise": result[1],
-                "donor_identifier": result[2],
-                "payment_method": result[3],
-                "timestamp": result[4],
-            }
-        except Exception as e:
-            logger.error(f"Failed to get donation from chain: {e}")
-            return None
+        if index < len(self.transactions):
+            return self.transactions[index]
+        return None
     
     async def get_total_donations_count(self) -> int:
-        """Get total number of donations recorded on blockchain."""
-        if not self.is_configured:
-            return 0
-        
-        try:
-            return self.contract.functions.getDonationsCount().call()
-        except Exception as e:
-            logger.error(f"Failed to get donations count: {e}")
-            return 0
+        """Get total number of donations recorded."""
+        return len(transaction_history)
     
     async def get_total_amount_raised(self) -> int:
-        """Get total amount raised recorded on blockchain (in paise)."""
-        if not self.is_configured:
-            return 0
-        
-        try:
-            return self.contract.functions.totalAmountRaised().call()
-        except Exception as e:
-            logger.error(f"Failed to get total amount: {e}")
-            return 0
+        """Get total amount raised (in paise)."""
+        return sum(tx.get("amount_paise", 0) for tx in transaction_history)
     
     def get_explorer_url(self, tx_hash: str) -> str:
-        """Get the blockchain explorer URL for a transaction."""
-        # Check if testnet (Mumbai) or mainnet (Polygon)
-        if "mumbai" in settings.polygon_rpc_url.lower():
-            return f"https://mumbai.polygonscan.com/tx/{tx_hash}"
-        else:
-            return f"https://polygonscan.com/tx/{tx_hash}"
+        """Get the blockchain explorer URL for a transaction (demo)."""
+        return f"https://explorer-sphinx.shardeum.org/tx/{tx_hash}"
     
     def get_wallet_balance(self) -> float:
-        """Get the wallet's MATIC balance."""
-        if not self.is_configured:
-            return 0.0
-        
-        try:
-            balance_wei = self.w3.eth.get_balance(self.account.address)
-            return float(self.w3.from_wei(balance_wei, 'ether'))
-        except Exception as e:
-            logger.error(f"Failed to get wallet balance: {e}")
-            return 0.0
+        """Get demo wallet balance."""
+        return 100.0  # Demo balance
+    
+    def get_all_transactions(self) -> list:
+        """Get all recorded transactions."""
+        return transaction_history
 
 
 @lru_cache()

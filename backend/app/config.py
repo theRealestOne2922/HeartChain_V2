@@ -27,8 +27,9 @@ class Settings(BaseSettings):
     supabase_anon_key: str = ""
     supabase_service_key: str = ""
     
-    # Blockchain Configuration
-    polygon_rpc_url: str = "https://rpc-mumbai.maticvigil.com"
+    # Blockchain Configuration (Shardeum)
+    shardeum_rpc_url: str = "https://sphinx.shardeum.org/"
+    polygon_rpc_url: str = "https://sphinx.shardeum.org/"
     contract_address: str = ""
     wallet_private_key: str = ""
     
@@ -41,6 +42,7 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
+        extra = "ignore"  # Allow extra env vars without errors
 
 
 @lru_cache()

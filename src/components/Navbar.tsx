@@ -1,14 +1,32 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, Menu, X, Wallet, User, Trophy, Sparkles, Check } from "lucide-react";
+import { Heart, Menu, X, Wallet, User, Trophy, Sparkles, Check, Database, LogOut, ChevronDown, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import { useWallet } from "@/context/WalletContext";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const { currentUser } = useUser();
-  const { isConnected: isWalletConnected, walletAddress, connectWallet } = useWallet();
+  const {
+    isConnected: isWalletConnected,
+    walletAddress,
+    balance,
+    networkName,
+    isCorrectNetwork,
+    connectWallet,
+    disconnectWallet,
+    switchToShardeum
+  } = useWallet();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -19,6 +37,7 @@ const Navbar = () => {
   const navLinks = [
     { href: "/", label: "Explore" },
     { href: "/saved-lives", label: "Saved Lives" },
+    { href: "/transactions", label: "Transactions", icon: Database },
     { href: "/leaderboard", label: "Leaderboard" },
     { href: "/about", label: "About" },
   ];
@@ -50,6 +69,7 @@ const Navbar = () => {
                 )}
               >
                 {link.label === "Saved Lives" && <Sparkles className="w-4 h-4 text-success" />}
+                {link.label === "Transactions" && <Database className="w-4 h-4 text-primary" />}
                 {link.label}
                 <span className={cn(
                   "absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300",
@@ -58,8 +78,6 @@ const Navbar = () => {
               </Link>
             ))}
           </div>
-
-          {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
             <Link to="/leaderboard">
               <Button variant="ghost" size="sm" className="gap-2">
@@ -67,15 +85,73 @@ const Navbar = () => {
                 <span className="font-semibold">Rank #{currentUser.rank}</span>
               </Button>
             </Link>
-            <Button
-              variant={isWalletConnected ? "default" : "outline"}
-              size="sm"
-              className={cn("gap-2", isWalletConnected && "bg-success text-success-foreground hover:bg-success/90")}
-              onClick={handleConnectWallet}
-            >
-              {isWalletConnected ? <Check className="w-4 h-4" /> : <Wallet className="w-4 h-4" />}
-              {isWalletConnected ? walletAddress : "Connect Wallet"}
-            </Button>
+
+            {isWalletConnected ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "gap-2 transition-all duration-300",
+                      isCorrectNetwork
+                        ? "border-emerald-500/30 hover:bg-emerald-500/10 hover:border-emerald-500/50"
+                        : "border-amber-500/30 hover:bg-amber-500/10"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-2 h-2 rounded-full animate-pulse",
+                      isCorrectNetwork ? "bg-emerald-500" : "bg-amber-500"
+                    )} />
+                    <span className="font-mono text-xs hidden lg:inline-block">
+                      {walletAddress?.slice(0, 6)}...{walletAddress?.slice(-4)}
+                    </span>
+                    {balance && (
+                      <span className="text-xs font-semibold ml-1">
+                        {balance} SHM
+                      </span>
+                    )}
+                    <ChevronDown className="w-3 h-3 opacity-50 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Wallet</DropdownMenuLabel>
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground bg-muted/50 rounded-md mx-1 mb-1 font-mono break-all">
+                    {walletAddress}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/transactions" className="flex items-center cursor-pointer">
+                      <Database className="w-4 h-4 mr-2" />
+                      Transaction History
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={connectWallet} className="cursor-pointer">
+                    <User className="w-4 h-4 mr-2" />
+                    Switch Account
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.open("https://explorer-sphinx.shardeum.org/account/" + walletAddress, "_blank")} className="cursor-pointer">
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    View on Explorer
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={disconnectWallet} className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Disconnect
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 border-primary/50 hover:border-primary"
+                onClick={handleConnectWallet}
+              >
+                <Wallet className="w-4 h-4" />
+                Connect MetaMask
+              </Button>
+            )}
             <Link to="/create-campaign">
               <Button size="sm" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white gap-2">
                 <Heart className="w-4 h-4 fill-primary" />
@@ -122,6 +198,7 @@ const Navbar = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.label === "Saved Lives" && <Sparkles className="w-4 h-4 text-success" />}
+                {link.label === "Transactions" && <Database className="w-4 h-4 text-primary" />}
                 {link.label}
               </Link>
             ))}
@@ -141,8 +218,8 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </div >
+    </nav >
   );
 };
 

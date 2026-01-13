@@ -6,9 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Campaign } from "@/types/campaign";
-import { Heart, Wallet, CreditCard, Sparkles, Smartphone, Shield, ExternalLink } from "lucide-react";
+import { Heart, Wallet, CreditCard, Sparkles, Smartphone, Shield, ExternalLink, Hash, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useWallet } from "@/context/WalletContext";
+import { useWallet, BlockchainTransaction } from "@/context/WalletContext";
+import BlockchainPipeline from "./BlockchainPipeline";
 
 interface DonationModalProps {
   campaign: Campaign;
@@ -24,17 +25,28 @@ type PaymentMethod = "upi" | "card" | "crypto";
 const paymentMethods = [
   { id: "upi" as PaymentMethod, label: "UPI", icon: Smartphone, description: "GPay, PhonePe, Paytm" },
   { id: "card" as PaymentMethod, label: "Card", icon: CreditCard, description: "Debit/Credit Card" },
-  { id: "crypto" as PaymentMethod, label: "Crypto", icon: Wallet, description: "MetaMask Wallet" },
+  { id: "crypto" as PaymentMethod, label: "Crypto", icon: Wallet, description: "MetaMask → Shardeum" },
 ];
 
 const DonationModal = ({ campaign, isOpen, onClose, onDonate }: DonationModalProps) => {
-  const { isConnected, requireWallet, connectWallet } = useWallet();
+  const {
+    isConnected,
+    isCorrectNetwork,
+    requireWallet,
+    connectWallet,
+    switchToShardeum,
+    sendDonation,
+    isLoading: isWalletLoading,
+  } = useWallet();
+
   const [amount, setAmount] = useState<number>(1000);
   const [customAmount, setCustomAmount] = useState<string>("");
   const [message, setMessage] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("upi");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("crypto");
+  const [currentTransaction, setCurrentTransaction] = useState<BlockchainTransaction | null>(null);
+  const [showPipeline, setShowPipeline] = useState(false);
 
   const handleAmountSelect = (value: number) => {
     setAmount(value);
@@ -52,20 +64,52 @@ const DonationModal = ({ campaign, isOpen, onClose, onDonate }: DonationModalPro
   const handleDonate = async () => {
     if (amount < 1) return;
 
-    // Only require wallet for crypto payments
-    if (paymentMethod === "crypto" && !isConnected) {
-      requireWallet();
-      return;
+    // For crypto payments, use actual blockchain transaction
+    if (paymentMethod === "crypto") {
+      if (!isConnected) {
+        requireWallet();
+        return;
+      }
+
+      if (!isCorrectNetwork) {
+        await switchToShardeum();
+        return;
+      }
+
+      setIsProcessing(true);
+      setShowPipeline(true);
+
+      try {
+        const tx = await sendDonation(campaign.id, campaign.title, amount);
+
+        if (tx) {
+          setCurrentTransaction(tx);
+          // Complete the donation flow
+          onDonate(amount, message, isAnonymous);
+
+          // Keep modal open to show the transaction result
+          setTimeout(() => {
+            setShowPipeline(false);
+            setCurrentTransaction(null);
+            onClose();
+          }, 5000);
+        } else {
+          setShowPipeline(false);
+        }
+      } catch (error) {
+        console.error("Donation failed:", error);
+        setShowPipeline(false);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else {
+      // Traditional payment methods (UPI/Card) - simulate for now
+      setIsProcessing(true);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      onDonate(amount, message, isAnonymous);
+      setIsProcessing(false);
+      onClose();
     }
-
-    setIsProcessing(true);
-
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    onDonate(amount, message, isAnonymous);
-    setIsProcessing(false);
-    onClose();
   };
 
   const remainingToGoal = campaign.goalAmount - campaign.raisedAmount;
@@ -75,7 +119,7 @@ const DonationModal = ({ campaign, isOpen, onClose, onDonate }: DonationModalPro
     switch (paymentMethod) {
       case "upi": return "Processing via UPI...";
       case "card": return "Processing Payment...";
-      case "crypto": return "Confirming on Blockchain...";
+      case "crypto": return "Confirm in MetaMask...";
     }
   };
 
@@ -86,6 +130,40 @@ const DonationModal = ({ campaign, isOpen, onClose, onDonate }: DonationModalPro
       case "crypto": return <Wallet className="w-5 h-5" />;
     }
   };
+
+  // If showing the blockchain pipeline
+  if (showPipeline) {
+    return (
+      <Dialog open={isOpen} onOpenChange={() => { }}>
+        <DialogContent className="sm:max-w-2xl max-h-[95vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl flex items-center gap-2">
+              <Hash className="w-6 h-6 text-primary" />
+              Recording on Blockchain
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-6">
+            <BlockchainPipeline
+              transaction={currentTransaction}
+              isProcessing={isProcessing && !currentTransaction}
+            />
+
+            {currentTransaction?.status === "confirmed" && (
+              <div className="mt-6 text-center">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 rounded-full text-emerald-400 mb-4">
+                  <Sparkles className="w-5 h-5" />
+                  Donation Successful!
+                </div>
+                <p className="text-muted-foreground text-sm">
+                  Your donation of ₹{amount.toLocaleString("en-IN")} has been permanently recorded on Shardeum blockchain.
+                </p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -125,9 +203,15 @@ const DonationModal = ({ campaign, isOpen, onClose, onDonate }: DonationModalPro
                     "flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all",
                     paymentMethod === method.id
                       ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
+                      : "border-border hover:border-primary/50",
+                    method.id === "crypto" && "relative overflow-hidden"
                   )}
                 >
+                  {method.id === "crypto" && (
+                    <div className="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-orange-500 text-[8px] text-white px-2 py-0.5 font-bold">
+                      REAL
+                    </div>
+                  )}
                   <method.icon className={cn(
                     "w-6 h-6",
                     paymentMethod === method.id ? "text-primary" : "text-muted-foreground"
@@ -146,20 +230,49 @@ const DonationModal = ({ campaign, isOpen, onClose, onDonate }: DonationModalPro
             </div>
           </div>
 
-          {/* Crypto wallet connection prompt */}
+          {/* Crypto wallet connection/network prompts */}
           {paymentMethod === "crypto" && !isConnected && (
-            <div className="p-4 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-xl">
-              <p className="text-sm text-orange-800 dark:text-orange-200 mb-3">
-                Connect your wallet to donate with cryptocurrency
+            <div className="p-4 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border border-orange-200 dark:border-orange-800 rounded-xl">
+              <div className="flex items-center gap-3 mb-3">
+                <Wallet className="w-8 h-8 text-orange-500" />
+                <div>
+                  <p className="font-semibold text-foreground">Connect MetaMask</p>
+                  <p className="text-sm text-muted-foreground">
+                    Your donation will be recorded on Shardeum blockchain
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={connectWallet}
+                disabled={isWalletLoading}
+                className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white"
+              >
+                {isWalletLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Connecting...
+                  </>
+                ) : (
+                  <>
+                    <Wallet className="w-4 h-4 mr-2" />
+                    Connect MetaMask
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {paymentMethod === "crypto" && isConnected && !isCorrectNetwork && (
+            <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+              <p className="text-sm text-amber-800 dark:text-amber-200 mb-3">
+                Please switch to Shardeum Sphinx network to donate
               </p>
               <Button
+                onClick={switchToShardeum}
                 variant="outline"
-                size="sm"
-                onClick={connectWallet}
-                className="border-orange-500 text-orange-600 hover:bg-orange-100"
+                className="border-amber-500 text-amber-600 hover:bg-amber-100"
               >
-                <Wallet className="w-4 h-4 mr-2" />
-                Connect Wallet
+                Switch to Shardeum
               </Button>
             </div>
           )}
@@ -216,6 +329,11 @@ const DonationModal = ({ campaign, isOpen, onClose, onDonate }: DonationModalPro
                 <span className="font-semibold text-primary">{percentageContribution}%</span> of the heart
                 and bring {campaign.beneficiaryName} closer to their goal.
               </p>
+              {paymentMethod === "crypto" && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  ≈ {(amount / 100).toFixed(4)} SHM at demo rate
+                </p>
+              )}
             </div>
           )}
 
@@ -249,12 +367,16 @@ const DonationModal = ({ campaign, isOpen, onClose, onDonate }: DonationModalPro
           {/* Donate button */}
           <Button
             onClick={handleDonate}
-            disabled={amount < 1 || isProcessing || (paymentMethod === "crypto" && !isConnected)}
+            disabled={
+              amount < 1 ||
+              isProcessing ||
+              (paymentMethod === "crypto" && (!isConnected || !isCorrectNetwork))
+            }
             className="w-full h-14 text-lg font-display font-semibold gradient-heart hover:opacity-90 transition-opacity"
           >
             {isProcessing ? (
               <span className="flex items-center gap-2">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
                 {getProcessingText()}
               </span>
             ) : (
@@ -269,7 +391,10 @@ const DonationModal = ({ campaign, isOpen, onClose, onDonate }: DonationModalPro
           <div className="flex items-center justify-center gap-2 p-3 bg-success/5 border border-success/20 rounded-lg">
             <Shield className="w-4 h-4 text-success" />
             <span className="text-xs text-success font-medium">
-              All donations are recorded on the blockchain for transparency
+              {paymentMethod === "crypto"
+                ? "Direct blockchain recording on Shardeum"
+                : "All donations are recorded on the blockchain for transparency"
+              }
             </span>
           </div>
 
@@ -277,7 +402,7 @@ const DonationModal = ({ campaign, isOpen, onClose, onDonate }: DonationModalPro
           <p className="text-[11px] text-muted-foreground text-center">
             {paymentMethod === "upi" && "You'll be redirected to your UPI app to complete payment"}
             {paymentMethod === "card" && "Secure payment processed via Razorpay"}
-            {paymentMethod === "crypto" && "Direct transfer from your connected wallet"}
+            {paymentMethod === "crypto" && "Direct transfer via MetaMask to Shardeum blockchain"}
           </p>
         </div>
       </DialogContent>

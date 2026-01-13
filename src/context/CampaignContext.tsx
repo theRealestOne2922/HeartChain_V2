@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Campaign } from "@/types/campaign";
 import { mockCampaigns as initialCampaigns } from "@/data/mockCampaigns";
 
@@ -10,8 +10,26 @@ interface CampaignContextType {
 
 const CampaignContext = createContext<CampaignContextType | undefined>(undefined);
 
+// Load campaigns from localStorage
+const loadCampaignsFromStorage = (): Campaign[] => {
+    try {
+        const saved = localStorage.getItem("heartchain_campaigns_v3");
+        if (saved) {
+            return JSON.parse(saved);
+        }
+    } catch (e) {
+        console.error("Failed to load campaigns from storage:", e);
+    }
+    return initialCampaigns;
+};
+
 export const CampaignProvider = ({ children }: { children: ReactNode }) => {
-    const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
+    const [campaigns, setCampaigns] = useState<Campaign[]>(() => loadCampaignsFromStorage());
+
+    // Save campaigns to localStorage whenever they change
+    useEffect(() => {
+        localStorage.setItem("heartchain_campaigns_v3", JSON.stringify(campaigns));
+    }, [campaigns]);
 
     const addCampaign = (newCampaign: Campaign) => {
         setCampaigns((prev) => [newCampaign, ...prev]);

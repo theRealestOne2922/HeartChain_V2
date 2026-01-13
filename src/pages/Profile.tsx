@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -122,11 +123,16 @@ const Profile = () => {
               </div>
 
               <div className="flex flex-wrap justify-center md:justify-start gap-2">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast.success("Profile link copied to clipboard!");
+                }}>
                   <Share2 className="w-4 h-4 mr-2" />
                   Share Profile
                 </Button>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" onClick={() => {
+                  toast.info("Settings", { description: "Profile settings are coming soon!" });
+                }}>
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </Button>

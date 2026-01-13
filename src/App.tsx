@@ -13,7 +13,10 @@ import CreateCampaign from "./pages/CreateCampaign";
 import Leaderboard from "./pages/Leaderboard";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
+import Transactions from "./pages/Transactions";
 import NotFound from "./pages/NotFound";
+
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -26,12 +29,14 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <ScrollToTop />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/create-campaign" element={<CreateCampaign />} />
                 <Route path="/campaign/:id" element={<CampaignDetail />} />
                 <Route path="/saved-lives" element={<SavedLives />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/transactions" element={<Transactions />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="*" element={<NotFound />} />
