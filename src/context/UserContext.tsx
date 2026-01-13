@@ -7,6 +7,7 @@ interface UserContextType {
     currentUser: LeaderboardUser;
     processDonation: (amount: number) => void;
     leaderboard: LeaderboardUser[];
+    updateUser: (updates: Partial<LeaderboardUser>) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -27,7 +28,7 @@ const initialUser: LeaderboardUser = {
 // Load user from localStorage
 const loadUserFromStorage = (): LeaderboardUser => {
     try {
-        const saved = localStorage.getItem("heartchain_user_v3");
+        const saved = localStorage.getItem("heartchain_user_v4");
         if (saved) {
             const parsed = JSON.parse(saved);
             return {
@@ -57,7 +58,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Save user to localStorage whenever they change
     useEffect(() => {
-        localStorage.setItem("heartchain_user_v3", JSON.stringify(currentUser));
+        localStorage.setItem("heartchain_user_v4", JSON.stringify(currentUser));
     }, [currentUser]);
 
     // Recalculate leaderboard whenever currentUser changes
@@ -129,8 +130,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         });
     };
 
+    const updateUser = (updates: Partial<LeaderboardUser>) => {
+        setCurrentUser(prev => ({ ...prev, ...updates }));
+    };
+
     return (
-        <UserContext.Provider value={{ currentUser, processDonation, leaderboard }}>
+        <UserContext.Provider value={{ currentUser, processDonation, leaderboard, updateUser }}>
             {children}
         </UserContext.Provider>
     );

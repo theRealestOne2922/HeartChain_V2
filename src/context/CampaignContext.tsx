@@ -13,7 +13,7 @@ const CampaignContext = createContext<CampaignContextType | undefined>(undefined
 // Load campaigns from localStorage
 const loadCampaignsFromStorage = (): Campaign[] => {
     try {
-        const saved = localStorage.getItem("heartchain_campaigns_v3");
+        const saved = localStorage.getItem("heartchain_campaigns_v4");
         if (saved) {
             return JSON.parse(saved);
         }
@@ -28,7 +28,7 @@ export const CampaignProvider = ({ children }: { children: ReactNode }) => {
 
     // Save campaigns to localStorage whenever they change
     useEffect(() => {
-        localStorage.setItem("heartchain_campaigns_v3", JSON.stringify(campaigns));
+        localStorage.setItem("heartchain_campaigns_v4", JSON.stringify(campaigns));
     }, [campaigns]);
 
     const addCampaign = (newCampaign: Campaign) => {

@@ -114,7 +114,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Load saved transactions on mount (only pending/failed ones, others come from backend)
     useEffect(() => {
-        const saved = localStorage.getItem("heartchain_transactions_v3");
+        const saved = localStorage.getItem("heartchain_transactions_v4");
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -132,7 +132,7 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
     // Save transactions to localStorage
     useEffect(() => {
         if (walletAddress) {
-            localStorage.setItem("heartchain_transactions_v3", JSON.stringify(transactions));
+            localStorage.setItem("heartchain_transactions_v4", JSON.stringify(transactions));
         }
     }, [transactions, walletAddress]);
 

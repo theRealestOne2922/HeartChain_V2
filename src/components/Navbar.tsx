@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, Menu, X, Wallet, User, Trophy, Sparkles, Check, Database, LogOut, ChevronDown, ExternalLink } from "lucide-react";
+import { Heart, Menu, X, Wallet, User, Trophy, Sparkles, Check, Database, LogOut, ChevronDown, ExternalLink, Stethoscope } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import { useWallet } from "@/context/WalletContext";
@@ -135,6 +135,13 @@ const Navbar = () => {
                     View on Explorer
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/hospital-dashboard" className="flex items-center cursor-pointer text-slate-600">
+                      <Stethoscope className="w-4 h-4 mr-2" />
+                      Hospital Portal
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={disconnectWallet} className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
                     <LogOut className="w-4 h-4 mr-2" />
                     Disconnect
@@ -211,6 +218,14 @@ const Navbar = () => {
                 {isWalletConnected ? <Check className="w-4 h-4" /> : <Wallet className="w-4 h-4" />}
                 {isWalletConnected ? walletAddress : "Connect Wallet"}
               </Button>
+              <Link
+                to="/hospital-dashboard"
+                className="flex items-center justify-center gap-2 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Stethoscope className="w-4 h-4" />
+                Hospital Admin Portal
+              </Link>
               <Button className="w-full gradient-heart text-primary-foreground gap-2">
                 <User className="w-4 h-4" />
                 Sign In

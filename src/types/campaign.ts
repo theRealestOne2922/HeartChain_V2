@@ -1,6 +1,6 @@
 export type CampaignCategory = 'people' | 'causes';
 
-export type PeopleSubcategory = 
+export type PeopleSubcategory =
   | 'cancer'
   | 'kidney-failure'
   | 'accident'
@@ -8,7 +8,7 @@ export type PeopleSubcategory =
   | 'chronic-illness'
   | 'other-medical';
 
-export type CausesSubcategory = 
+export type CausesSubcategory =
   | 'education'
   | 'disaster-relief'
   | 'healthcare-fund'
@@ -36,6 +36,9 @@ export interface Campaign {
   location: string;
   createdAt: Date;
   updatedAt: Date;
+  hospitalId?: string;
+  verificationStatus?: 'PENDING' | 'VERIFIED' | 'RELEASED';
+  verificationTxHash?: string;
 }
 
 export interface Donation {

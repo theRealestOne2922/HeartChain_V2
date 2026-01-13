@@ -9,7 +9,7 @@ export const mockCampaigns: Campaign[] = [
     category: "people",
     subcategory: "surgery",
     goalAmount: 800000,
-    raisedAmount: 400000, // 50%
+    raisedAmount: 400000,
     donorCount: 450,
     daysLeft: 12,
     urgencyLevel: "critical",
@@ -18,6 +18,8 @@ export const mockCampaigns: Campaign[] = [
     location: "Mumbai, MH",
     createdAt: new Date("2024-01-15"),
     updatedAt: new Date("2024-01-20"),
+    hospitalId: "890123", // Apollo
+    verificationStatus: 'PENDING',
   },
   {
     id: "2",
@@ -27,7 +29,7 @@ export const mockCampaigns: Campaign[] = [
     category: "people",
     subcategory: "cancer",
     goalAmount: 4500000,
-    raisedAmount: 2250000, // 50%
+    raisedAmount: 2250000,
     donorCount: 1200,
     daysLeft: 45,
     urgencyLevel: "high",
@@ -36,6 +38,8 @@ export const mockCampaigns: Campaign[] = [
     location: "Delhi, DL",
     createdAt: new Date("2024-01-10"),
     updatedAt: new Date("2024-01-19"),
+    hospitalId: "774129", // AIIMS
+    verificationStatus: 'PENDING',
   },
   {
     id: "3",
@@ -45,7 +49,7 @@ export const mockCampaigns: Campaign[] = [
     category: "people",
     subcategory: "kidney-failure",
     goalAmount: 1200000,
-    raisedAmount: 600000, // 50%
+    raisedAmount: 600000,
     donorCount: 350,
     daysLeft: 30,
     urgencyLevel: "high",
@@ -54,6 +58,8 @@ export const mockCampaigns: Campaign[] = [
     location: "Ahmedabad, GJ",
     createdAt: new Date("2024-01-12"),
     updatedAt: new Date("2024-01-18"),
+    hospitalId: "556214", // Mayo
+    verificationStatus: 'PENDING',
   },
   {
     id: "4",
@@ -63,7 +69,7 @@ export const mockCampaigns: Campaign[] = [
     category: "causes",
     subcategory: "disaster-relief",
     goalAmount: 5000000,
-    raisedAmount: 2500000, // 50%
+    raisedAmount: 2500000,
     donorCount: 3100,
     daysLeft: 60,
     urgencyLevel: "critical",
@@ -72,6 +78,7 @@ export const mockCampaigns: Campaign[] = [
     location: "Odisha Coast",
     createdAt: new Date("2024-01-05"),
     updatedAt: new Date("2024-01-20"),
+    // Non-medical, no hospital
   },
   {
     id: "5",
@@ -81,7 +88,7 @@ export const mockCampaigns: Campaign[] = [
     category: "causes",
     subcategory: "education",
     goalAmount: 2500000,
-    raisedAmount: 1250000, // 50%
+    raisedAmount: 1250000,
     donorCount: 1100,
     daysLeft: 90,
     urgencyLevel: "medium",
@@ -99,7 +106,7 @@ export const mockCampaigns: Campaign[] = [
     category: "people",
     subcategory: "accident",
     goalAmount: 350000,
-    raisedAmount: 175000, // 50%
+    raisedAmount: 175000,
     donorCount: 400,
     daysLeft: 21,
     urgencyLevel: "medium",
@@ -108,6 +115,8 @@ export const mockCampaigns: Campaign[] = [
     location: "Bangalore, KA",
     createdAt: new Date("2024-01-08"),
     updatedAt: new Date("2024-01-19"),
+    hospitalId: "890123", // Apollo
+    verificationStatus: 'PENDING',
   },
   {
     id: "7",
@@ -117,7 +126,7 @@ export const mockCampaigns: Campaign[] = [
     category: "causes",
     subcategory: "healthcare-fund",
     goalAmount: 3500000,
-    raisedAmount: 1750000, // 50%
+    raisedAmount: 1750000,
     donorCount: 1800,
     daysLeft: 120,
     urgencyLevel: "medium",
@@ -135,7 +144,7 @@ export const mockCampaigns: Campaign[] = [
     category: "people",
     subcategory: "chronic-illness",
     goalAmount: 1500000,
-    raisedAmount: 750000, // 50%
+    raisedAmount: 750000,
     donorCount: 550,
     daysLeft: 35,
     urgencyLevel: "medium",
@@ -144,6 +153,8 @@ export const mockCampaigns: Campaign[] = [
     location: "Pune, MH",
     createdAt: new Date("2024-01-03"),
     updatedAt: new Date("2024-01-18"),
+    hospitalId: "332156", // Hopkins
+    verificationStatus: 'PENDING',
   },
   {
     id: "9",
@@ -153,7 +164,7 @@ export const mockCampaigns: Campaign[] = [
     category: "people",
     subcategory: "surgery",
     goalAmount: 500000,
-    raisedAmount: 500000, // 100%
+    raisedAmount: 500000,
     donorCount: 1247,
     daysLeft: 0,
     urgencyLevel: "critical",
@@ -162,6 +173,9 @@ export const mockCampaigns: Campaign[] = [
     location: "Chennai, TN",
     createdAt: new Date("2023-12-01"),
     updatedAt: new Date("2024-01-10"),
+    hospitalId: "890123", // Apollo
+    verificationStatus: 'RELEASED',
+    verificationTxHash: '0xabc123...', // Demo hash
   },
   {
     id: "10",
@@ -171,7 +185,7 @@ export const mockCampaigns: Campaign[] = [
     category: "people",
     subcategory: "accident",
     goalAmount: 1800000,
-    raisedAmount: 1800000, // 100%
+    raisedAmount: 1800000,
     donorCount: 2156,
     daysLeft: 0,
     urgencyLevel: "high",
@@ -180,6 +194,9 @@ export const mockCampaigns: Campaign[] = [
     location: "Hyderabad, TS",
     createdAt: new Date("2023-11-15"),
     updatedAt: new Date("2024-01-05"),
+    hospitalId: "774129", // AIIMS
+    verificationStatus: 'RELEASED',
+    verificationTxHash: '0xdef456...', // Demo hash
   },
 ];
 

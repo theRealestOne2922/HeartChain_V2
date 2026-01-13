@@ -14,6 +14,7 @@ import Leaderboard from "./pages/Leaderboard";
 import About from "./pages/About";
 import Profile from "./pages/Profile";
 import Transactions from "./pages/Transactions";
+import HospitalDashboard from "./pages/HospitalDashboard";
 import NotFound from "./pages/NotFound";
 
 import ScrollToTop from "./components/ScrollToTop";
@@ -37,6 +38,7 @@ const App = () => (
                 <Route path="/saved-lives" element={<SavedLives />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/transactions" element={<Transactions />} />
+                <Route path="/hospital-dashboard" element={<HospitalDashboard />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="*" element={<NotFound />} />

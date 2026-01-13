@@ -26,16 +26,56 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 const Profile = () => {
-  const { currentUser } = useUser();
+  const { currentUser, updateUser } = useUser();
   const [activeTab, setActiveTab] = useState<"achievements" | "donations" | "impact">("achievements");
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [tempName, setTempName] = useState(currentUser.displayName);
+
+  // Sync state when user changes
+  useState(() => {
+    setTempName(currentUser.displayName);
+  });
+
+  const handleSaveSettings = () => {
+    if (tempName.trim()) {
+      updateUser({ displayName: tempName });
+      setIsSettingsOpen(false);
+      toast.success("Profile Updated Successfully!");
+    } else {
+      toast.error("Name cannot be empty.");
+    }
+  };
 
   // Calculate next badge progress
   const unlockedBadgeIds = currentUser.badges.map(b => b.id);
   const nextBadge = BADGES.find(b => !unlockedBadgeIds.includes(b.id));
+
+  const getCurrentValue = (badge: typeof nextBadge) => {
+    if (!badge) return 0;
+    switch (badge.requirement.type) {
+      case 'donation_amount': return currentUser.totalDonated;
+      case 'donation_count': return currentUser.donationCount;
+      case 'lives_saved': return currentUser.livesSaved;
+      default: return 0;
+    }
+  };
+
+  const currentValue = getCurrentValue(nextBadge);
+
   const nextBadgeProgress = nextBadge
-    ? Math.min((currentUser.totalDonated / nextBadge.requirement.value) * 100, 100)
+    ? Math.min((currentValue / nextBadge.requirement.value) * 100, 100)
     : 100;
 
   // Mock donation history
@@ -53,6 +93,11 @@ const Profile = () => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const formatBadgeValue = (val: number, type?: string) => {
+    if (type === 'donation_amount') return formatCurrency(val);
+    return val.toString(); // For counts
   };
 
   const formatDate = (date: Date) => {
@@ -130,9 +175,7 @@ const Profile = () => {
                   <Share2 className="w-4 h-4 mr-2" />
                   Share Profile
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => {
-                  toast.info("Settings", { description: "Profile settings are coming soon!" });
-                }}>
+                <Button variant="ghost" size="sm" onClick={() => setIsSettingsOpen(true)}>
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </Button>
@@ -173,7 +216,7 @@ const Profile = () => {
                     <p className="text-sm text-muted-foreground">{nextBadge.description}</p>
                   </div>
                   <p className="text-sm font-medium text-muted-foreground">
-                    {formatCurrency(currentUser.totalDonated)} / {formatCurrency(nextBadge.requirement.value)}
+                    {formatBadgeValue(currentValue, nextBadge.requirement.type)} / {formatBadgeValue(nextBadge.requirement.value, nextBadge.requirement.type)}
                   </p>
                 </div>
                 <Progress value={nextBadgeProgress} className="h-2" />
@@ -358,8 +401,36 @@ const Profile = () => {
         </div>
       </section>
 
+      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+            <DialogDescription>
+              Make changes to your profile here. Click save when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="name"
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
+                className="col-span-3"
+              />
+            </div>
+            {/* Future settings can go here */}
+          </div>
+          <DialogFooter>
+            <Button type="submit" onClick={handleSaveSettings} className="gradient-heart">Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Footer />
-    </div>
+    </div >
   );
 };
 

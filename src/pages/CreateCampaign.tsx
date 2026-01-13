@@ -24,9 +24,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { useCampaigns } from "@/context/CampaignContext";
 import { Upload, IndianRupee, Heart, Sparkles, AlertTriangle } from "lucide-react";
+import { HOSPITALS } from "@/data/hospitals";
 
 // Define validation schema
 const formSchema = z.object({
@@ -40,7 +42,16 @@ const formSchema = z.object({
     beneficiaryName: z.string().min(2, "Name required"),
     location: z.string().min(2, "Location required"),
     urgencyLevel: z.enum(["critical", "high", "medium", "low"]),
-    imageUrl: z.string().optional(), // In a real app, this would be a file validation
+    imageUrl: z.string().optional(),
+    hospitalId: z.string().optional(),
+}).refine((data) => {
+    if (data.category === "people" && !data.hospitalId) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Partner Hospital is required for medical campaigns",
+    path: ["hospitalId"],
 });
 
 const CreateCampaign = () => {
@@ -62,16 +73,22 @@ const CreateCampaign = () => {
             location: "",
             urgencyLevel: "medium",
             imageUrl: "",
+            hospitalId: "",
         },
     });
+
+    const selectedCategory = form.watch("category");
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setIsSubmitting(true);
 
-        // Simulate network delay for verification
+        const isMedical = values.category === "people";
+
         toast({
-            title: "Verifying Documents...",
-            description: "Checking identity and medical records securely on-chain.",
+            title: isMedical ? "Submitting for Verification..." : "Verifying Documents...",
+            description: isMedical
+                ? "Your campaign is being securely sent to the partner hospital for approval."
+                : "Checking identity and medical records securely on-chain.",
             duration: 2000,
         });
 
@@ -88,20 +105,23 @@ const CreateCampaign = () => {
             donorCount: 0,
             daysLeft: 30,
             urgencyLevel: values.urgencyLevel,
-            isVerified: true, // Auto-verified for demo
+            isVerified: !isMedical, // Only verified if NOT medical (auto-verify for demo causes)
+            verificationStatus: (isMedical ? 'PENDING' : 'VERIFIED') as 'PENDING' | 'VERIFIED' | 'RELEASED',
+            hospitalId: values.hospitalId,
             beneficiaryName: values.beneficiaryName,
             location: values.location,
             createdAt: new Date(),
             updatedAt: new Date(),
-            // Use placeholder if no image provided/uploaded
             imageUrl: imagePreview || "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=800",
         };
 
         addCampaign(newCampaign);
 
         toast({
-            title: "Campaign Verified & Live! ✅",
-            description: "Your fundraiser has been verified and is now accepting donations.",
+            title: isMedical ? "Campaign Submitted! 🏥" : "Campaign Live! ✅",
+            description: isMedical
+                ? "Your campaign is pending hospital verification."
+                : "Your fundraiser is now live.",
             duration: 5000,
         });
 
@@ -196,6 +216,39 @@ const CreateCampaign = () => {
                                             )}
                                         />
                                     </div>
+
+                                    {selectedCategory === "people" && (
+                                        <FormField
+                                            control={form.control}
+                                            name="hospitalId"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-primary font-semibold flex items-center gap-2">
+                                                        Partner Hospital
+                                                        <Badge variant="outline" className="text-xs font-normal">Required for Verified Campaigns</Badge>
+                                                    </FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select Verification Partner" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {HOSPITALS.map(h => (
+                                                                <SelectItem key={h.id} value={h.id}>
+                                                                    {h.name} ({h.region})
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormDescription className="text-xs">
+                                                        This campaign will be sent to the selected hospital for identity and medical verification.
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
 
                                     <FormField
                                         control={form.control}
