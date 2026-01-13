@@ -37,7 +37,7 @@ const CampaignGrid = ({ campaigns, title, showFilters = true }: CampaignGridProp
   });
 
   return (
-    <section className="py-16">
+    <section id="campaign-grid" className="py-16">
       <div className="container mx-auto px-4">
         {/* Section header */}
         {title && (
@@ -100,8 +100,8 @@ const CampaignGrid = ({ campaigns, title, showFilters = true }: CampaignGridProp
               className="animate-slide-up"
               style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <CampaignCard 
-                campaign={campaign} 
+              <CampaignCard
+                campaign={campaign}
                 onClick={() => navigate(`/campaign/${campaign.id}`)}
               />
             </div>

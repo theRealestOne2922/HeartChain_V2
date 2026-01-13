@@ -31,7 +31,7 @@ const DonorsList = ({ donations, className }: DonorsListProps) => {
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-semibold">
                   {donation.isAnonymous ? "?" : donation.donorName.charAt(0)}
                 </div>
-                
+
                 <div>
                   <p className="font-semibold text-foreground">
                     {donation.isAnonymous ? "Anonymous Hero" : donation.donorName}
@@ -49,7 +49,7 @@ const DonorsList = ({ donations, className }: DonorsListProps) => {
 
               <div className="text-right">
                 <p className="font-display font-bold text-lg text-primary">
-                  ${donation.amount.toLocaleString()}
+                  ₹{donation.amount.toLocaleString('en-IN')}
                 </p>
                 {donation.transactionHash && (
                   <a

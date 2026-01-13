@@ -24,16 +24,16 @@ const urgencyLabels = {
 
 const CampaignCard = ({ campaign, onClick }: CampaignCardProps) => {
   const progress = (campaign.raisedAmount / campaign.goalAmount) * 100;
-  const formattedRaised = new Intl.NumberFormat("en-US", {
+  const formattedRaised = new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "USD",
+    currency: "INR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(campaign.raisedAmount);
 
-  const formattedGoal = new Intl.NumberFormat("en-US", {
+  const formattedGoal = new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "USD",
+    currency: "INR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(campaign.goalAmount);
@@ -55,7 +55,7 @@ const CampaignCard = ({ campaign, onClick }: CampaignCardProps) => {
           alt={campaign.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        
+
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
@@ -82,7 +82,7 @@ const CampaignCard = ({ campaign, onClick }: CampaignCardProps) => {
 
         {/* Heart progress overlay */}
         <div className="absolute bottom-3 right-3">
-          <HeartProgress progress={progress} size="sm" animate={false} />
+          <HeartProgress progress={progress} size="sm" animate={false} showPercentage={true} />
         </div>
       </div>
 
@@ -133,7 +133,7 @@ const CampaignCard = ({ campaign, onClick }: CampaignCardProps) => {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <Users className="w-4 h-4" />
-              {campaign.donorCount}
+              {campaign.donorCount.toLocaleString('en-IN')}
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />

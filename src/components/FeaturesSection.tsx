@@ -4,7 +4,7 @@ const features = [
   {
     icon: Eye,
     title: "Full Transparency",
-    description: "Every dollar tracked on the blockchain. See exactly where your money goes.",
+    description: "Every rupee tracked on the blockchain. See exactly where your money goes.",
     color: "text-accent",
     bgColor: "bg-accent/10",
   },
@@ -55,7 +55,7 @@ const FeaturesSection = () => {
             Giving, <span className="text-gradient">Reimagined</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            HeartChain combines blockchain transparency with emotional engagement 
+            HeartChain combines blockchain transparency with emotional engagement
             to make philanthropy personal, trackable, and rewarding.
           </p>
         </div>

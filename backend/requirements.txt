@@ -1,0 +1,23 @@
+# FastAPI Core
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.9
+
+# Database
+supabase>=2.0.0
+
+# Payment Gateway
+razorpay>=1.4.0
+
+# Blockchain
+web3>=6.0.0
+
+# Environment & Security
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# Utilities
+httpx>=0.26.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4

@@ -3,18 +3,24 @@ import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import CampaignGrid from "@/components/CampaignGrid";
 import Footer from "@/components/Footer";
-import { mockCampaigns, getFeaturedCampaigns } from "@/data/mockCampaigns";
+import { getFeaturedCampaigns } from "@/data/mockCampaigns";
+import { useCampaigns } from "@/context/CampaignContext";
 
 const Index = () => {
+  const { campaigns } = useCampaigns();
+
+  // Only show active (incomplete) campaigns on home page
+  const activeCampaigns = campaigns.filter(c => c.raisedAmount < c.goalAmount);
+
   const featuredCampaigns = getFeaturedCampaigns();
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Hero with animated heart */}
       <HeroSection />
-      
+
       {/* Featured urgent campaigns */}
       <section className="py-8 bg-urgent/5 border-y border-urgent/20">
         <div className="container mx-auto px-4">
@@ -27,17 +33,17 @@ const Index = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Features */}
       <FeaturesSection />
-      
+
       {/* Campaign discovery */}
-      <CampaignGrid 
-        campaigns={mockCampaigns} 
-        title="Fill Hearts, Change Lives" 
-        showFilters 
+      <CampaignGrid
+        campaigns={activeCampaigns}
+        title="Fill Hearts, Change Lives"
+        showFilters
       />
-      
+
       {/* Footer */}
       <Footer />
     </div>

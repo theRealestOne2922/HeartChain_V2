@@ -1,14 +1,17 @@
 import { useNavigate } from "react-router-dom";
-import { getCompletedCampaigns } from "@/data/mockCampaigns";
+import { useCampaigns } from "@/context/CampaignContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CampaignCard from "@/components/CampaignCard";
-import { Heart, Sparkles, PartyPopper, Users, DollarSign } from "lucide-react";
+import { Heart, Sparkles, PartyPopper, Users, IndianRupee } from "lucide-react";
 
 const SavedLives = () => {
   const navigate = useNavigate();
-  const completedCampaigns = getCompletedCampaigns();
-  
+  const { campaigns } = useCampaigns();
+
+  // Dynamic filter from context
+  const completedCampaigns = campaigns.filter(c => c.raisedAmount >= c.goalAmount);
+
   const totalRaised = completedCampaigns.reduce((sum, c) => sum + c.raisedAmount, 0);
   const totalDonors = completedCampaigns.reduce((sum, c) => sum + c.donorCount, 0);
 
@@ -27,9 +30,9 @@ const SavedLives = () => {
               </h1>
               <PartyPopper className="w-10 h-10 text-success animate-bounce" style={{ animationDelay: '0.2s' }} />
             </div>
-            
+
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-              Every beating heart on this page represents a life transformed by the collective 
+              Every beating heart on this page represents a life transformed by the collective
               generosity of our community. These are the stories of hope fulfilled.
             </p>
 
@@ -44,15 +47,15 @@ const SavedLives = () => {
               </div>
               <div className="bg-card rounded-2xl px-8 py-6 shadow-card">
                 <div className="flex items-center gap-2 text-primary mb-2">
-                  <DollarSign className="w-6 h-6" />
-                  <span className="font-display text-3xl font-bold">${totalRaised.toLocaleString()}</span>
+                  <IndianRupee className="w-6 h-6" />
+                  <span className="font-display text-3xl font-bold">₹{totalRaised.toLocaleString('en-IN')}</span>
                 </div>
                 <p className="text-muted-foreground">Total Raised</p>
               </div>
               <div className="bg-card rounded-2xl px-8 py-6 shadow-card">
                 <div className="flex items-center gap-2 text-secondary mb-2">
                   <Users className="w-6 h-6" />
-                  <span className="font-display text-3xl font-bold">{totalDonors.toLocaleString()}</span>
+                  <span className="font-display text-3xl font-bold">{totalDonors.toLocaleString('en-IN')}</span>
                 </div>
                 <p className="text-muted-foreground">Hearts United</p>
               </div>
@@ -78,8 +81,8 @@ const SavedLives = () => {
                     className="animate-slide-up"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <CampaignCard 
-                      campaign={campaign} 
+                    <CampaignCard
+                      campaign={campaign}
                       onClick={() => navigate(`/campaign/${campaign.id}`)}
                     />
                   </div>

@@ -36,8 +36,8 @@ const BigHeart = ({ progress, isComplete = false, className }: BigHeartProps) =>
           isComplete
             ? "bg-primary/40 blur-3xl animate-pulse scale-125"
             : displayProgress > 50
-            ? "bg-primary/25 blur-2xl scale-110"
-            : "bg-muted/20 blur-xl"
+              ? "bg-primary/25 blur-2xl scale-110"
+              : "bg-muted/20 blur-xl"
         )}
       />
 
@@ -65,10 +65,11 @@ const BigHeart = ({ progress, isComplete = false, className }: BigHeartProps) =>
           viewBox="0 0 24 24"
           className={cn(
             "absolute inset-0 w-full h-full transition-all duration-[2000ms] ease-out drop-shadow-2xl",
-            isComplete && "animate-heartbeat"
+            isComplete && "animate-heartbeat origin-center"
           )}
           style={{
-            clipPath: `inset(${fillPercentage}% 0 0 0)`,
+            // Don't use clipPath for completed hearts to prevent box showing during scale animation
+            clipPath: isComplete ? 'none' : `inset(${fillPercentage}% 0 0 0)`,
             filter: isComplete ? 'drop-shadow(0 0 30px hsl(var(--primary)))' : 'none',
           }}
         >
@@ -93,7 +94,7 @@ const BigHeart = ({ progress, isComplete = false, className }: BigHeartProps) =>
               isComplete ? "text-primary-foreground" : displayProgress > 50 ? "text-primary-foreground" : "text-foreground"
             )}
           >
-            {Math.round(displayProgress)}%
+            {Math.min(Math.round(displayProgress), 100)}%
           </span>
           <span className={cn(
             "text-sm font-medium mt-1 transition-colors duration-500",

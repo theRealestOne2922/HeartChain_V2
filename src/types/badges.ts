@@ -33,10 +33,10 @@ export const BADGES: Achievement[] = [
   {
     id: 'generous_soul',
     name: 'Generous Soul',
-    description: 'Contributed a total of $100 to save lives',
+    description: 'Contributed a total of ₹10,000 to save lives',
     icon: '✨',
     tier: 'silver',
-    requirement: { type: 'donation_amount', value: 100 }
+    requirement: { type: 'donation_amount', value: 10000 }
   },
   {
     id: 'life_supporter',
@@ -49,10 +49,10 @@ export const BADGES: Achievement[] = [
   {
     id: 'heart_guardian',
     name: 'Heart Guardian',
-    description: 'Donated over $500 and saved multiple lives',
+    description: 'Donated over ₹40,000 and saved multiple lives',
     icon: '🛡️',
     tier: 'gold',
-    requirement: { type: 'donation_amount', value: 500 }
+    requirement: { type: 'donation_amount', value: 40000 }
   },
   {
     id: 'community_pillar',
@@ -65,18 +65,18 @@ export const BADGES: Achievement[] = [
   {
     id: 'humanity_champion',
     name: 'Humanity Champion',
-    description: 'Contributed over $1,000 to those in need',
+    description: 'Contributed over ₹80,000 to those in need',
     icon: '🏆',
     tier: 'platinum',
-    requirement: { type: 'donation_amount', value: 1000 }
+    requirement: { type: 'donation_amount', value: 80000 }
   },
   {
     id: 'legend_of_impact',
     name: 'Legend of Impact',
-    description: 'A top donor who has changed countless lives with over $5,000 donated',
+    description: 'A top donor who has changed countless lives with over ₹4,00,000 donated',
     icon: '👑',
     tier: 'diamond',
-    requirement: { type: 'donation_amount', value: 5000 }
+    requirement: { type: 'donation_amount', value: 400000 }
   }
 ];
 

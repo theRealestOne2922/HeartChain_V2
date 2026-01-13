@@ -6,16 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import BadgeDisplay, { BadgeGrid } from "@/components/BadgeDisplay";
-import { currentUser } from "@/data/mockUsers";
+import { useUser } from "@/context/UserContext"; // Use context
 import { BADGES, Achievement, getTierColor, getTierGradient } from "@/types/badges";
 import { mockCampaigns } from "@/data/mockCampaigns";
 import HeartProgress from "@/components/HeartProgress";
-import { 
-  Heart, 
-  Trophy, 
-  Calendar, 
-  Share2, 
-  Settings, 
+import {
+  Heart,
+  Trophy,
+  Calendar,
+  Share2,
+  Settings,
   Edit2,
   TrendingUp,
   Gift,
@@ -27,27 +27,28 @@ import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
 const Profile = () => {
+  const { currentUser } = useUser();
   const [activeTab, setActiveTab] = useState<"achievements" | "donations" | "impact">("achievements");
 
   // Calculate next badge progress
   const unlockedBadgeIds = currentUser.badges.map(b => b.id);
   const nextBadge = BADGES.find(b => !unlockedBadgeIds.includes(b.id));
-  const nextBadgeProgress = nextBadge 
+  const nextBadgeProgress = nextBadge
     ? Math.min((currentUser.totalDonated / nextBadge.requirement.value) * 100, 100)
     : 100;
 
   // Mock donation history
   const donationHistory = [
-    { id: "1", campaignId: "1", amount: 100, date: new Date("2024-01-10") },
-    { id: "2", campaignId: "2", amount: 75, date: new Date("2024-01-05") },
-    { id: "3", campaignId: "4", amount: 50, date: new Date("2023-12-20") },
-    { id: "4", campaignId: "6", amount: 50, date: new Date("2023-12-15") },
+    { id: "1", campaignId: "1", amount: 8000, date: new Date("2024-01-10") },
+    { id: "2", campaignId: "2", amount: 6000, date: new Date("2024-01-05") },
+    { id: "3", campaignId: "4", amount: 4000, date: new Date("2023-12-20") },
+    { id: "4", campaignId: "6", amount: 4000, date: new Date("2023-12-15") },
   ];
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "USD",
+      currency: "INR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
@@ -134,8 +135,8 @@ const Profile = () => {
 
             {/* Impact Heart */}
             <div className="hidden lg:block">
-              <HeartProgress 
-                progress={Math.min((currentUser.totalDonated / 500) * 100, 100)} 
+              <HeartProgress
+                progress={Math.min((currentUser.totalDonated / 40000) * 100, 100)}
                 size="lg"
                 showPercentage
                 animate
@@ -224,7 +225,7 @@ const Profile = () => {
                         )}>
                           {isUnlocked ? badge.icon : <Lock className="w-6 h-6" />}
                         </div>
-                        <Badge 
+                        <Badge
                           variant={isUnlocked ? "default" : "secondary"}
                           className={cn(
                             "text-xs capitalize",
@@ -337,7 +338,7 @@ const Profile = () => {
                   You're Making a Difference!
                 </h3>
                 <p className="text-muted-foreground max-w-md mx-auto mb-4">
-                  Every donation you make brings hope to someone in need. 
+                  Every donation you make brings hope to someone in need.
                   Keep going to climb the leaderboard and unlock more badges!
                 </p>
                 <Button asChild className="gradient-heart">

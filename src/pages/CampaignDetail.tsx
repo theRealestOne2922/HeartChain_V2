@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { mockCampaigns } from "@/data/mockCampaigns";
+import { useCampaigns } from "@/context/CampaignContext";
+import { useUser } from "@/context/UserContext";
 import { Donation } from "@/types/campaign";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -27,7 +28,7 @@ import { toast } from "sonner";
 
 // Mock donations for demo
 const generateMockDonations = (campaignId: string, count: number): Donation[] => {
-  const names = ["Sarah M.", "John D.", "Emily R.", "Michael K.", "Jessica L.", "David W.", "Amanda P.", "Chris B."];
+  const names = ["Ananya S.", "Rohan K.", "Priya P.", "Vikram S.", "Neha V.", "Arjun R.", "Meera I.", "Suresh K."];
   const messages = [
     "Stay strong! We're all rooting for you!",
     "Sending love and prayers your way.",
@@ -37,13 +38,15 @@ const generateMockDonations = (campaignId: string, count: number): Donation[] =>
     "Wishing you a speedy recovery!",
     "Hope this helps. Stay positive!",
     "",
+    "600 rupees sent with love",
+    "",
   ];
 
   return Array.from({ length: count }).map((_, i) => ({
     id: `donation-${campaignId}-${i}`,
     campaignId,
     donorName: names[i % names.length],
-    amount: [10, 25, 50, 100, 250, 500, 1000][Math.floor(Math.random() * 7)],
+    amount: [500, 1000, 2000, 5000, 10000, 25000, 50000][Math.floor(Math.random() * 7)],
     message: messages[i % messages.length] || undefined,
     isAnonymous: Math.random() > 0.7,
     transactionHash: `0x${Math.random().toString(16).slice(2, 10)}...${Math.random().toString(16).slice(2, 6)}`,
@@ -54,15 +57,28 @@ const generateMockDonations = (campaignId: string, count: number): Donation[] =>
 const CampaignDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { campaigns, updateCampaign } = useCampaigns();
+  const { processDonation } = useUser();
   const [isDonationOpen, setIsDonationOpen] = useState(false);
-  const [campaign, setCampaign] = useState(mockCampaigns.find((c) => c.id === id));
+
+  // Handler to open donation modal
+  const handleOpenDonation = () => {
+    setIsDonationOpen(true);
+  };
+
+  // Directly access campaign from context to ensure real-time updates
+  const campaign = campaigns.find((c) => c.id === id);
   const [donations, setDonations] = useState<Donation[]>([]);
 
   useEffect(() => {
     if (campaign) {
-      setDonations(generateMockDonations(campaign.id, Math.min(campaign.donorCount, 20)));
+      // Only generate initial mock donations if usage is low (prevents overwrite on re-render)
+      // Or just keep it simple for now, maybe use a ref to track if generated
+      if (donations.length === 0) {
+        setDonations(generateMockDonations(campaign.id, Math.min(campaign.donorCount, 20)));
+      }
     }
-  }, [campaign]);
+  }, [campaign?.id]); // Only re-run if ID changes
 
   if (!campaign) {
     return (
@@ -97,16 +113,20 @@ const CampaignDetail = () => {
     };
 
     setDonations([newDonation, ...donations]);
-    setCampaign({
-      ...campaign,
+
+    // Update global state - PERMANENTLY
+    updateCampaign(campaign.id, {
       raisedAmount: campaign.raisedAmount + amount,
-      donorCount: campaign.donorCount + 1,
+      donorCount: campaign.donorCount + 1
     });
+
+    // Process donation for achievements and leaderboard
+    processDonation(amount);
 
     toast.success(
       <div className="flex items-center gap-2">
         <Heart className="w-5 h-5 text-primary fill-primary" />
-        <span>Thank you for your ${amount} donation!</span>
+        <span>Thank you for your ₹{amount} donation!</span>
       </div>
     );
   };
@@ -147,14 +167,14 @@ const CampaignDetail = () => {
               <div className="grid grid-cols-3 gap-6 w-full max-w-md text-center">
                 <div className="bg-card rounded-xl p-4 shadow-card">
                   <p className="font-display text-2xl font-bold text-primary">
-                    ${campaign.raisedAmount.toLocaleString()}
+                    ₹{campaign.raisedAmount.toLocaleString('en-IN')}
                   </p>
                   <p className="text-sm text-muted-foreground">Raised</p>
                 </div>
                 <div className="bg-card rounded-xl p-4 shadow-card">
                   <p className="font-display text-2xl font-bold text-foreground flex items-center justify-center gap-1">
                     <Users className="w-5 h-5" />
-                    {campaign.donorCount.toLocaleString()}
+                    {campaign.donorCount.toLocaleString('en-IN')}
                   </p>
                   <p className="text-sm text-muted-foreground">Donors</p>
                 </div>
@@ -175,7 +195,7 @@ const CampaignDetail = () => {
                     A Heart Made Whole
                   </h3>
                   <p className="text-muted-foreground">
-                    This beating heart represents a life saved. {campaign.beneficiaryName} can now receive the care they desperately needed, 
+                    This beating heart represents a life saved. {campaign.beneficiaryName} can now receive the care they desperately needed,
                     thanks to the collective love of {campaign.donorCount} compassionate souls.
                   </p>
                 </div>
@@ -254,10 +274,10 @@ const CampaignDetail = () => {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-semibold text-foreground">
-                    ${campaign.raisedAmount.toLocaleString()}
+                    ₹{campaign.raisedAmount.toLocaleString('en-IN')}
                   </span>
                   <span className="text-muted-foreground">
-                    of ${campaign.goalAmount.toLocaleString()} goal
+                    of ₹{campaign.goalAmount.toLocaleString('en-IN')} goal
                   </span>
                 </div>
               </div>
@@ -266,7 +286,7 @@ const CampaignDetail = () => {
               <div className="flex gap-3">
                 {!isComplete ? (
                   <Button
-                    onClick={() => setIsDonationOpen(true)}
+                    onClick={handleOpenDonation}
                     className="flex-1 h-14 text-lg font-display font-semibold gradient-heart hover:opacity-90 transition-opacity"
                   >
                     <Heart className="w-5 h-5 mr-2 fill-white" />

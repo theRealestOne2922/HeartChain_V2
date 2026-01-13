@@ -155,9 +155,11 @@
   }
   
   .text-gradient {
-    @apply bg-clip-text text-transparent inline-block;
+    @apply bg-clip-text text-transparent;
     background: linear-gradient(135deg, hsl(270, 60%, 50%), hsl(350, 85%, 60%));
     -webkit-background-clip: text;
     background-clip: text;
+    padding-bottom: 0.1em; /* Prevents descender clipping on g, y, p etc */
+    display: inline; /* Use inline instead of inline-block to prevent clipping */
   }
 }

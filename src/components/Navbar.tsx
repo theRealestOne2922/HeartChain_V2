@@ -1,12 +1,20 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, Menu, X, Wallet, User, Trophy, Sparkles } from "lucide-react";
+import { Heart, Menu, X, Wallet, User, Trophy, Sparkles, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/context/UserContext";
+import { useWallet } from "@/context/WalletContext";
 
 const Navbar = () => {
+  const { currentUser } = useUser();
+  const { isConnected: isWalletConnected, walletAddress, connectWallet } = useWallet();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+
+  const handleConnectWallet = () => {
+    connectWallet();
+  };
 
   const navLinks = [
     { href: "/", label: "Explore" },
@@ -56,13 +64,24 @@ const Navbar = () => {
             <Link to="/leaderboard">
               <Button variant="ghost" size="sm" className="gap-2">
                 <Trophy className="w-4 h-4" />
-                <span className="font-semibold">Rank #127</span>
+                <span className="font-semibold">Rank #{currentUser.rank}</span>
               </Button>
             </Link>
-            <Button variant="outline" size="sm" className="gap-2">
-              <Wallet className="w-4 h-4" />
-              Connect Wallet
+            <Button
+              variant={isWalletConnected ? "default" : "outline"}
+              size="sm"
+              className={cn("gap-2", isWalletConnected && "bg-success text-success-foreground hover:bg-success/90")}
+              onClick={handleConnectWallet}
+            >
+              {isWalletConnected ? <Check className="w-4 h-4" /> : <Wallet className="w-4 h-4" />}
+              {isWalletConnected ? walletAddress : "Connect Wallet"}
             </Button>
+            <Link to="/create-campaign">
+              <Button size="sm" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white gap-2">
+                <Heart className="w-4 h-4 fill-primary" />
+                Start Fundraiser
+              </Button>
+            </Link>
             <Link to="/profile">
               <Button size="sm" className="gradient-heart text-primary-foreground gap-2">
                 <User className="w-4 h-4" />
@@ -107,9 +126,13 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
-              <Button variant="outline" className="w-full gap-2">
-                <Wallet className="w-4 h-4" />
-                Connect Wallet
+              <Button
+                variant={isWalletConnected ? "default" : "outline"}
+                className={cn("w-full gap-2", isWalletConnected && "bg-success text-success-foreground")}
+                onClick={handleConnectWallet}
+              >
+                {isWalletConnected ? <Check className="w-4 h-4" /> : <Wallet className="w-4 h-4" />}
+                {isWalletConnected ? walletAddress : "Connect Wallet"}
               </Button>
               <Button className="w-full gradient-heart text-primary-foreground gap-2">
                 <User className="w-4 h-4" />

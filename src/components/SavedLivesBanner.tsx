@@ -42,7 +42,7 @@ const SavedLivesBanner = ({ campaign, className }: SavedLivesBannerProps) => {
         </div>
 
         <p className="text-white/90 text-lg md:text-xl mb-6 max-w-2xl mx-auto">
-          Thanks to the incredible generosity of {campaign.donorCount.toLocaleString()} donors,{" "}
+          Thanks to the incredible generosity of {campaign.donorCount.toLocaleString('en-IN')} donors,{" "}
           <span className="font-semibold">{campaign.beneficiaryName}</span> has received the full support they needed!
         </p>
 
@@ -50,14 +50,14 @@ const SavedLivesBanner = ({ campaign, className }: SavedLivesBannerProps) => {
           <div className="bg-white/20 backdrop-blur-sm rounded-xl px-6 py-3">
             <p className="text-white/80 text-sm">Total Raised</p>
             <p className="font-display text-2xl font-bold text-white">
-              ${campaign.raisedAmount.toLocaleString()}
+              ₹{campaign.raisedAmount.toLocaleString('en-IN')}
             </p>
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-xl px-6 py-3">
             <p className="text-white/80 text-sm">Hearts United</p>
             <p className="font-display text-2xl font-bold text-white flex items-center gap-2">
               <Heart className="w-5 h-5 fill-white" />
-              {campaign.donorCount.toLocaleString()}
+              {campaign.donorCount.toLocaleString('en-IN')}
             </p>
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-xl px-6 py-3">

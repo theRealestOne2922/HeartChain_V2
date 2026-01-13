@@ -5,24 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BadgeGrid } from "@/components/BadgeDisplay";
-import { mockUsers, currentUser, getTopDonors, getWeeklyTopDonors } from "@/data/mockUsers";
-import { LeaderboardUser } from "@/data/mockUsers";
+import { useUser } from "@/context/UserContext"; // Use context
 import { Trophy, Crown, Medal, Heart, TrendingUp, Users, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type LeaderboardType = "all-time" | "weekly";
 
 const Leaderboard = () => {
+  const { currentUser, leaderboard } = useUser(); // Get dynamic data
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>("all-time");
 
-  const topDonors = leaderboardType === "all-time" 
-    ? getTopDonors(15) 
-    : getWeeklyTopDonors(15);
+  const topDonors = leaderboardType === "all-time"
+    ? leaderboard.sort((a, b) => b.totalDonated - a.totalDonated).slice(0, 15) // Use fresh sort from context
+    : leaderboard.sort((a, b) => (b.weeklyDonated || 0) - (a.weeklyDonated || 0)).slice(0, 15);
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "USD",
+      currency: "INR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
@@ -55,9 +55,9 @@ const Leaderboard = () => {
   };
 
   // Calculate totals
-  const totalDonated = mockUsers.reduce((sum, u) => sum + u.totalDonated, 0) + currentUser.totalDonated;
-  const totalLivesSaved = mockUsers.reduce((sum, u) => sum + u.livesSaved, 0);
-  const totalDonors = mockUsers.length + 1;
+  const totalDonated = leaderboard.reduce((sum, u) => sum + u.totalDonated, 0);
+  const totalLivesSaved = leaderboard.reduce((sum, u) => sum + u.livesSaved, 0);
+  const totalDonors = leaderboard.length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -77,7 +77,7 @@ const Leaderboard = () => {
             </h1>
 
             <p className="text-lg text-muted-foreground mb-8">
-              Celebrating the generous hearts who make the biggest impact. 
+              Celebrating the generous hearts who make the biggest impact.
               Every donation brings us closer to a world where no one is left behind.
             </p>
 
